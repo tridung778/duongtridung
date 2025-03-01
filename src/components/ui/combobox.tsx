@@ -52,7 +52,7 @@ export function Combobox({ datas = [], setValue, value }: ComboboxProps) {
           <CommandList>
             <CommandEmpty>Không tìm thấy đài này.</CommandEmpty>
             <CommandGroup heading="Đài">
-              {datas.map((data, index) => (
+              {datas.map((data) => (
                 <CommandItem
                   key={data.code}
                   value={data.code}
