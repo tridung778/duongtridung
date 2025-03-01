@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Input } from "@/components/ui/input";
 import { getLotteryData } from "@/utils/fecht-lottery-api";
@@ -16,7 +17,7 @@ import {
 } from "@/utils/findWinningPrize";
 
 const TraVeNhanhPage = () => {
-  const [data, setData] = useState();
+  const [data, setData] = useState<any>();
   const [value, setValue] = useState("miba");
   const [number, setNumber] = useState<string>("");
 
@@ -36,8 +37,8 @@ const TraVeNhanhPage = () => {
       return;
     }
 
-    if (["mb", "mn", "mt"].includes(data.t.navCate)) {
-      const results = data.t.issueList.flatMap((item) => {
+    if (data && ["mb", "mn", "mt"].includes(data.t.navCate)) {
+      const results = data.t.issueList.flatMap((item: any) => {
         let lotteryResults = [];
         const prizes = [];
         if (data.t.navCate === "mb") {
