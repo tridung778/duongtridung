@@ -1,7 +1,25 @@
-import React from "react";
+"use client";
+import { getLotteryData } from "@/utils/fecht-lottery-api";
+import { useEffect, useState } from "react";
 
-const page = () => {
-  return <div>page</div>;
+const TraVeNhanhPage = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    getLotteryData("miba").then((res) => {
+      setData(res);
+    });
+  }, []);
+  return (
+    <div>
+      {data && (
+        <div>
+          <h2>Dữ liệu từ API:</h2>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default page;
+export default TraVeNhanhPage;
