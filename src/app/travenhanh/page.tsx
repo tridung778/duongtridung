@@ -16,6 +16,10 @@ import {
   findWinningPrizeSouthSide,
 } from "@/utils/findWinningPrize";
 
+interface LotteryResults {
+  [key: string]: string[];
+}
+
 const TraVeNhanhPage = () => {
   const [data, setData] = useState<any>();
   const [value, setValue] = useState("miba");
@@ -39,7 +43,7 @@ const TraVeNhanhPage = () => {
 
     if (data && ["mb", "mn", "mt"].includes(data.t.navCate)) {
       const results = data.t.issueList.flatMap((item: any) => {
-        let lotteryResults = [];
+        let lotteryResults: LotteryResults = {};
         const prizes = [];
         if (data.t.navCate === "mb") {
           lotteryResults = convertLotteryResultsNorthSide(item.detail);
