@@ -1,3 +1,5 @@
 export default function Home() {
-  return <></>;
+  return (
+    <div className="flex h-[80vh] justify-center items-center">Dũng Senpai</div>
+  );
 }

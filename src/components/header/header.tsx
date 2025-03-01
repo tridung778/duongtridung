@@ -7,6 +7,7 @@ import {
   NavigationMenuList,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
+import { ModeToggle } from "../mode-toggle";
 
 const Header = () => {
   return (
@@ -30,7 +31,7 @@ const Header = () => {
                 className="flex w-full items-center py-2 text-lg font-semibold"
                 prefetch={false}
               >
-                Home
+                Trang chủ
               </Link>
               <Link
                 href="#"
@@ -75,7 +76,7 @@ const Header = () => {
                 className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
                 prefetch={false}
               >
-                Home
+                Trang chủ
               </Link>
             </NavigationMenuLink>
             <NavigationMenuLink asChild>
@@ -117,8 +118,9 @@ const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="ml-auto flex gap-2">
-          <Button variant="outline">Sign in</Button>
-          <Button>Sign Up</Button>
+          <Button variant="outline">Đăng nhập</Button>
+          <Button>Đăng ký</Button>
+          <ModeToggle />
         </div>
       </header>
     </div>
