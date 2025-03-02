@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useState } from "react";
+import LeaderBoard from "./leaderboard";
 
 const DinoGame = () => {
   const [score, setScore] = useState(0);
 
   // Hàm này sẽ được gọi từ iframe để cập nhật điểm số
-  const handleMessage = (event) => {
+  const handleMessage = (event: MessageEvent<any>) => {
+    console.log("Message received:", event.data);
     if (event.data.type === "UPDATE_SCORE") {
       setScore(event.data.score);
     }
@@ -20,14 +24,13 @@ const DinoGame = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Dino Game</h1>
-      <iframe
-        src="/dino.html" // Đường dẫn đến file HTML trong thư mục public
-        className="w-full h-full absolute top-0 left-0 border-none"
-      />
-      <div className="absolute top-5 left-5 text-2xl z-10">
-        Điểm số: {score}
+    <div
+      className="min-h-[80vh] flex items-center justify-center"
+      suppressHydrationWarning
+    >
+      <div className="flex flex-col items-center w-full max-w-[800px]">
+        <iframe src="/dino.html" className="w-full h-[50vh] border-none" />
+        <LeaderBoard />
       </div>
     </div>
   );

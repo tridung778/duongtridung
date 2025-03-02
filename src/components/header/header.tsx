@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -8,8 +9,32 @@ import {
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
 import { ModeToggle } from "../mode-toggle";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import maskEmail from "@/utils/maskEmail";
 
 const Header = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setEmail(user?.email || "");
+      setIsLoggedIn(!!user); // user tồn tại thì isLoggedIn = true
+    });
+    return () => unsubscribe(); // Cleanup khi component unmount
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login"); // Chuyển hướng sau khi đăng xuất
+    } catch (err) {
+      console.error("Lỗi đăng xuất:", err);
+    }
+  };
   return (
     <div>
       <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
@@ -99,7 +124,7 @@ const Header = () => {
             </NavigationMenuLink>
             <NavigationMenuLink asChild>
               <Link
-                href="#"
+                href="/dino"
                 className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
                 prefetch={false}
               >
@@ -118,8 +143,19 @@ const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
         <div className="ml-auto flex gap-2">
-          <Button variant="outline">Đăng nhập</Button>
-          <Button>Đăng ký</Button>
+          {isLoggedIn ? (
+            <div>
+              {maskEmail(email)}{" "}
+              <Button onClick={handleLogout}>Đăng xuất</Button>
+            </div>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => router.push("/signup")}>
+                Đăng ký
+              </Button>
+              <Button onClick={() => router.push("/login")}>Đăng nhập</Button>
+            </>
+          )}
           <ModeToggle />
         </div>
       </header>
