@@ -16,16 +16,15 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Swal from "sweetalert2";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState(""); // Thay vì username, dùng email cho Firebase
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Reset lỗi
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -37,13 +36,29 @@ export default function SignUpPage() {
       router.push("/"); // Chuyển hướng đến trang đăng nhập sau khi đăng ký
     } catch (err: any) {
       if (err.code === "auth/email-already-in-use") {
-        setError("Email đã được sử dụng!");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Email đã được sử dụng!",
+        });
       } else if (err.code === "auth/invalid-email") {
-        setError("Email không hợp lệ!");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Email không hợp lệ!",
+        });
       } else if (err.code === "auth/weak-password") {
-        setError("Mật khẩu phải ít nhất 6 ký tự!");
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Mật khẩu quá yếu!",
+        });
       } else {
-        setError("Đã có lỗi xảy ra: " + err.message);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Đã xảy ra lỗi!",
+        });
       }
       console.error("Lỗi:", err.code, err.message);
     }
@@ -81,7 +96,6 @@ export default function SignUpPage() {
                 required
               />
             </div>
-            {error && <p className="text-red-500">{error}</p>}
             <div className="space-y-2">
               Quay lại trang{" "}
               <Link href="/login" className="text-blue-400">
