@@ -2,14 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LeaderBoard from "./leaderboard";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 const DinoGame = () => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [score, setScore] = useState(0);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
@@ -25,9 +26,30 @@ const DinoGame = () => {
     return () => unsubscribe();
   }, [router]);
 
+  useEffect(() => {
+    if (user) {
+      // Lấy điểm từ Firestore
+      const docRef = doc(db, "leaderboard", user.uid);
+      onSnapshot(docRef, (doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          getScore({ type: "GET_SCORE", score: data.score });
+        }
+      });
+    }
+  }, [user]);
+
+  const getScore = async (responseData: any) => {
+    if (iframeRef.current) {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(responseData, "*");
+      }
+    }
+  };
+
   // Hàm này sẽ được gọi từ iframe để cập nhật điểm số
   const handleMessage = async (event: MessageEvent<any>) => {
-    console.log("Message received:", event.data);
+    // console.log("Message received:", event.data);
     if (event.data.type === "UPDATE_SCORE" && user) {
       const newScore = event.data.score;
       setScore(newScore);
@@ -65,7 +87,11 @@ const DinoGame = () => {
       suppressHydrationWarning
     >
       <div className="flex flex-col items-center w-full max-w-[800px]">
-        <iframe src="/dino.html" className="w-full h-[50vh] border-none" />
+        <iframe
+          ref={iframeRef}
+          src="/dino.html"
+          className="w-full h-[50vh] border-none rounded-lg"
+        />
         <LeaderBoard currentUser={user} />
       </div>
     </div>

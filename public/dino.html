@@ -308,6 +308,31 @@
                     this.update();
                     window.addEventListener(Runner.events.RESIZE,
                         this.debounceResize.bind(this));
+                    // console.log("Game initialized");
+                    window.addEventListener("message", (event) => {
+                        if (event.data.type === "GET_SCORE") {
+                            // console.log("Nhận yêu cầu lấy điểm từ parent ", event.data.score);
+                            const scoreStr = event.data.score.join('');  // nối thành "00045"
+                            const rawScore = parseInt(scoreStr, 10);       // chuyển thành số, ví dụ: 45
+                            // console.log("rawScore", rawScore);
+                            // console.log("this.config.COEFFICIENT", this.config.COEFFICIENT);
+
+                            const tempdistanceRan = rawScore / 0.025;
+                            // console.log("tempdistanceRan", tempdistanceRan);
+                            // Cập nhật highestScore dựa trên giá trị mới nhận được
+                            this.highestScore = Math.ceil(tempdistanceRan);
+                            this.distanceMeter.setHighScore(this.highestScore);
+                            // console.log("end", this.highestScore);
+
+
+                            if (event.data.status === "success") {
+                                console.log("Phản hồi từ parent:", event.data.message);
+                            } else if (event.data.status === "error") {
+                                console.error("Lỗi từ parent:", event.data.message);
+                            }
+                        }
+                    });
+
                 },
                 /**
                 * Create the touch controller. A div that covers whole screen.
@@ -605,7 +630,7 @@
                         this.highestScore = Math.ceil(this.distanceRan);
                         this.distanceMeter.setHighScore(this.highestScore);
                         window.parent.postMessage({ type: "UPDATE_SCORE", score: this.distanceMeter.digits }, "*");
-                        // console.log("Message sent:", { type: "UPDATE_SCORE", score: this.distanceMeter.digits });
+                        // console.log("Message sent:", this.distanceMeter.digits);
                     }
                     // Reset the time clock.
                     this.time = getTimeStamp();
@@ -1399,7 +1424,7 @@
                 this.maxScore = 0;
                 this.highScore = 0;
                 this.container = null;
-                this.digits = [];
+                this.digits = ['3', '0', '0', '4', '9'];
                 this.acheivement = false;
                 this.defaultString = '';
                 this.flashTimer = 0;

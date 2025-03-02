@@ -79,7 +79,9 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
           <TableRow
             key={entry.uid}
             className={`hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors ${
-              entry.uid === currentUser?.uid ? "bg-lime-100" : ""
+              entry.uid === currentUser?.uid
+                ? "bg-lime-100 dark:bg-green-900"
+                : ""
             }`}
           >
             <TableCell className="text-center font-medium">
