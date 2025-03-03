@@ -52,7 +52,7 @@ const Header = () => {
             </Link>
             <div className="grid gap-2 py-6">
               <Link
-                href="#"
+                href="/"
                 className="flex w-full items-center py-2 text-lg font-semibold"
                 prefetch={false}
               >
@@ -63,21 +63,21 @@ const Header = () => {
                 className="flex w-full items-center py-2 text-lg font-semibold"
                 prefetch={false}
               >
-                About
+                Trang cá nhân
               </Link>
               <Link
-                href="#"
+                href="/travenhanh"
                 className="flex w-full items-center py-2 text-lg font-semibold"
                 prefetch={false}
               >
-                Services
+                Tra vé nhanh
               </Link>
               <Link
-                href="#"
+                href="/dino"
                 className="flex w-full items-center py-2 text-lg font-semibold"
                 prefetch={false}
               >
-                Portfolio
+                Khủng long
               </Link>
               <Link
                 href="#"

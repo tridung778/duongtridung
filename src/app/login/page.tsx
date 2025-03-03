@@ -16,11 +16,11 @@ import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
+import Swal from "sweetalert2";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -43,11 +43,15 @@ export default function LoginPage() {
         },
         { merge: true }
       ); // merge: true để không ghi đè dữ liệu cũ nếu đã tồn tại
-
-      console.log("Đăng nhập thành công và lưu vào Firestore:", user);
       router.push("/");
     } catch (err: any) {
-      setError(err.message);
+      if (err.code === "auth/invalid-credential") {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Tài khoản hoặc mật khẩu không đúng",
+        });
+      }
     }
   };
 

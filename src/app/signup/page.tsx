@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase"; // Đảm bảo bạn đã cấu hình file này
+import { auth, db } from "@/lib/firebase"; // Đảm bảo bạn đã cấu hình file này
 import {
   Card,
   CardHeader,
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Swal from "sweetalert2";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function SignUpPage() {
   const [username, setUsername] = useState(""); // Thay vì username, dùng email cho Firebase
@@ -32,7 +33,18 @@ export default function SignUpPage() {
         username,
         password
       );
-      console.log("Đăng ký thành công:", userCredential.user);
+
+      const user = userCredential.user;
+      // Lưu thông tin người dùng vào Firestore
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          uid: user.uid,
+          email: user.email,
+          lastLogin: new Date().toISOString(),
+        },
+        { merge: true }
+      ); // merge: true để không ghi đè dữ liệu cũ nếu đã tồn tại
       router.push("/"); // Chuyển hướng đến trang đăng nhập sau khi đăng ký
     } catch (err: any) {
       if (err.code === "auth/email-already-in-use") {

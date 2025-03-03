@@ -33,6 +33,7 @@ const DinoGame = () => {
       onSnapshot(docRef, (doc) => {
         if (doc.exists()) {
           const data = doc.data();
+          // console.log("Đang lắng nghe điểm số...", data.score);
           getScore({ type: "GET_SCORE", score: data.score });
         }
       });
