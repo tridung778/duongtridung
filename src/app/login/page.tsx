@@ -60,7 +60,7 @@ export default function LoginPage() {
       className="flex items-center justify-center h-[80vh]"
       suppressHydrationWarning
     >
-      <Card className="mx-auto w-full max-w-md">
+      <Card className="mx-auto max-w-md lg:w-full w-[80%]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Đăng nhập</CardTitle>
           <CardDescription>Nhập thông tin tài khoản của bạn</CardDescription>

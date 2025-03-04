@@ -91,7 +91,7 @@ const DinoGame = () => {
         <iframe
           ref={iframeRef}
           src="/dino.html"
-          className="w-full h-[50vh] border-none rounded-lg"
+          className="w-full lg:h-[50vh] h-[30vh] border-none rounded-lg"
         />
         <LeaderBoard currentUser={user} />
       </div>

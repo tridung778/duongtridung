@@ -56,7 +56,7 @@ const TraVeNhanhPage = () => {
         return prizes.length > 0
           ? prizes.map(
               (prize) =>
-                `Số ${number} trúng giải ${prize} ngày ${item.turnNum} đài ${data.t.name}`
+                `Số ${number} trúng giải ${prize} ngày ${item.turnNum} đài ${data.t.name}`,
             )
           : [];
       });
@@ -75,13 +75,19 @@ const TraVeNhanhPage = () => {
 
   return (
     <div>
-      <div className=" flex flex-col items-center justify-center h-96">
+      <div className="mx-5 flex h-96 flex-col items-center justify-center">
         <div className="text-4xl">Tra vé nhanh 🚀</div>
         <div>Một trang web giúp hỗ trợ tra cứu vé số nhanh hơn!</div>
-        <div className="mt-4 flex space-x-4">
+        <div className="mt-4 grid grid-cols-2 gap-5 lg:grid-cols-3">
           <Combobox datas={mangDai} setValue={setValue} value={value} />
-          <Input type="text" onChange={(e) => setNumber(e.target.value)} />
-          <Button onClick={handleSearch}>Tìm kiếm</Button>
+          <Input
+            type="text"
+            onChange={(e) => setNumber(e.target.value)}
+            className="w-[180px]"
+          />
+          <Button onClick={handleSearch} className="col-span-2 lg:col-span-1">
+            Tìm kiếm
+          </Button>
         </div>
       </div>
     </div>

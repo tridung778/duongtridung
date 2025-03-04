@@ -81,7 +81,7 @@ export default function SignUpPage() {
       className="flex items-center justify-center h-[80vh]"
       suppressHydrationWarning
     >
-      <Card className="mx-auto w-full max-w-md">
+      <Card className="mx-auto lg:w-full w-[80%] max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Đăng ký</CardTitle>
           <CardDescription>Nhập thông tin tài khoản của bạn</CardDescription>

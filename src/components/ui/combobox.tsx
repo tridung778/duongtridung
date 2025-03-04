@@ -38,7 +38,7 @@ export function Combobox({ datas = [], setValue, value }: ComboboxProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-[180px] justify-between"
         >
           {value ? datas.find((data) => data.code === value)?.name : "Chọn đài"}
           <ChevronsUpDown className="opacity-50" />
@@ -63,7 +63,7 @@ export function Combobox({ datas = [], setValue, value }: ComboboxProps) {
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === data.code ? "opacity-100" : "opacity-0"
+                      value === data.code ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>
