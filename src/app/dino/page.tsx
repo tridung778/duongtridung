@@ -8,6 +8,7 @@ import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 
 const DinoGame = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -64,7 +65,7 @@ const DinoGame = () => {
             score: newScore,
             timestamp: new Date().toISOString(),
           },
-          { merge: true } // Giữ lại dữ liệu cũ nếu đã có
+          { merge: true }, // Giữ lại dữ liệu cũ nếu đã có
         );
         console.log("Điểm đã được gửi lên Firestore!");
       } catch (error) {
@@ -83,19 +84,26 @@ const DinoGame = () => {
   if (!user) return null; // Không hiển thị nếu chưa đăng nhập
 
   return (
-    <div
-      className="min-h-[80vh] flex items-center justify-center"
-      suppressHydrationWarning
-    >
-      <div className="flex flex-col items-center w-full max-w-[800px]">
-        <iframe
-          ref={iframeRef}
-          src="/dino.html"
-          className="w-full lg:h-[50vh] h-[30vh] border-none rounded-lg"
-        />
-        <LeaderBoard currentUser={user} />
+    <>
+      <Head>
+        <meta property="og:title" content="Khủng long" />
+        <meta property="og:description" content="Chơi game khủng long" />
+        <meta property="og:image" content="/images/dino_game.jng" />
+      </Head>
+      <div
+        className="flex min-h-[80vh] items-center justify-center"
+        suppressHydrationWarning
+      >
+        <div className="flex w-full max-w-[800px] flex-col items-center">
+          <iframe
+            ref={iframeRef}
+            src="/dino.html"
+            className="h-[30vh] w-full rounded-lg border-none lg:h-[50vh]"
+          />
+          <LeaderBoard currentUser={user} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
