@@ -19,29 +19,29 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { Button } from "@/components/ui/button";
+import { ArrowUp } from "lucide-react";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [lastDoc, setLastDoc] = useState<any>(null); // Lưu document cuối cùng của lô trước
-  const [hasMore, setHasMore] = useState(true); // Kiểm tra còn dữ liệu để tải không
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const router = useRouter();
-  const POSTS_PER_PAGE = 5; // Số bài viết tải mỗi lần
+  const POSTS_PER_PAGE = 5;
 
   const user = auth.currentUser;
 
-  // Hàm tải bài viết
   const fetchPosts = async (isInitialLoad = false) => {
     try {
       let q;
       if (isInitialLoad || !lastDoc) {
-        // Lần tải đầu tiên
         q = query(
           collection(db, "posts"),
-          orderBy("upvotes", "desc"), // Sắp xếp theo upvotes giảm dần
+          orderBy("upvotes", "desc"),
           limit(POSTS_PER_PAGE),
         );
       } else {
-        // Tải lô tiếp theo
         q = query(
           collection(db, "posts"),
           orderBy("upvotes", "desc"),
@@ -56,20 +56,42 @@ export default function Home() {
         ...doc.data(),
       })) as Post[];
 
-      if (newPosts.length < POSTS_PER_PAGE) setHasMore(false); // Không còn dữ liệu để tải
+      if (newPosts.length === 0 || newPosts.length < POSTS_PER_PAGE) {
+        setHasMore(false); // Không còn dữ liệu để tải
+      }
 
-      setPosts((prevPosts) =>
-        isInitialLoad ? newPosts : [...prevPosts, ...newPosts],
-      );
-      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]); // Lưu document cuối
+      // Loại bỏ trùng lặp dựa trên id
+      setPosts((prevPosts) => {
+        const existingIds = new Set(prevPosts.map((post) => post.id));
+        const filteredNewPosts = newPosts.filter(
+          (post) => !existingIds.has(post.id),
+        );
+        return isInitialLoad ? newPosts : [...prevPosts, ...filteredNewPosts];
+      });
+
+      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]);
     } catch (error) {
       console.error("Lỗi khi tải bài viết:", error);
     }
   };
-
   // Tải lần đầu khi trang được render
   useEffect(() => {
     fetchPosts(true);
+  }, []);
+
+  // Theo dõi cuộn để hiển thị nút
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        // Hiển thị nút khi cuộn xuống 300px
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll); // Dọn dẹp
   }, []);
 
   const handleVote = async (id: string, voteType: "up" | "down") => {
@@ -128,6 +150,14 @@ export default function Home() {
     fetchPosts(); // Refresh từ Firestore để đảm bảo đồng bộ
   };
 
+  // Hàm cuộn lên trên
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Cuộn mượt mà
+    });
+  };
+
   return (
     <main className="mx-auto max-w-2xl p-4">
       <div className="mb-6 flex items-center justify-between">
@@ -151,6 +181,17 @@ export default function Home() {
           />
         ))}
       </InfiniteScroll>
+
+      {/* Nút cuộn lên trên */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed right-4 bottom-4 rounded-full p-2"
+          variant="default"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </Button>
+      )}
     </main>
   );
 }
