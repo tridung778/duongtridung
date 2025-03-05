@@ -13,6 +13,7 @@ import { auth, db } from "@/lib/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 interface CreatePostModalProps {
   onCreate: () => void;
@@ -23,12 +24,35 @@ export function CreatePostModal({ onCreate }: CreatePostModalProps) {
   const [content, setContent] = useState("");
   const [open, setOpen] = useState(false);
 
+  // Giới hạn độ dài
+  const TITLE_MAX_LENGTH = 100; // Tiêu đề tối đa 100 ký tự
+  const CONTENT_MAX_LENGTH = 1000; // Nội dung tối đa 1000 ký tự
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const user = auth.currentUser; // Lấy thông tin người dùng đã đăng nhập
 
     if (!user) {
       alert("Vui lòng đăng nhập để tạo bài viết!");
+      return;
+    }
+
+    // Kiểm tra độ dài trước khi submit
+    if (title.length > TITLE_MAX_LENGTH) {
+      Swal.fire(
+        "Lỗi!",
+        `Tiêu đề không được vượt quá ${TITLE_MAX_LENGTH} ký tự!`,
+        "error",
+      );
+      return;
+    }
+
+    if (content.length > CONTENT_MAX_LENGTH) {
+      Swal.fire(
+        "Lỗi!",
+        `Nội dung không được vượt quá ${CONTENT_MAX_LENGTH} ký tự!`,
+        "error",
+      );
       return;
     }
 

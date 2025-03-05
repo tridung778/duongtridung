@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import Swal from "sweetalert2";
 
 interface PostCardProps {
   post: Post;
@@ -35,12 +36,26 @@ export function PostCard({
 
   const handleDelete = async () => {
     if (!isOwner) return; // Chỉ chủ sở hữu mới xóa được
-    try {
-      await deleteDoc(doc(db, "posts", post.id));
-      onDelete(post.id); // Gọi callback để refresh danh sách
-    } catch (error) {
-      console.error("Lỗi khi xóa bài viết:", error);
-    }
+    Swal.fire({
+      title: "Bạn có chắc muốn xóa bài viết này?",
+      showConfirmButton: true,
+      confirmButtonText: "Xóa",
+      confirmButtonColor: "#2E2E2E",
+      showCancelButton: true,
+      cancelButtonText: "Hủy",
+      cancelButtonColor: "#d33",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteDoc(doc(db, "posts", post.id));
+          onDelete(post.id);
+          Swal.fire("Đã xóa!", "Bài viết đã được xóa thành công.", "success");
+        } catch (error) {
+          console.log("Error deleting post:", error);
+          Swal.fire("Lỗi!", "Không thể xóa bài viết.", "error");
+        }
+      }
+    });
   };
 
   return (

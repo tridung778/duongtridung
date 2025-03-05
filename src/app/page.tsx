@@ -1,32 +1,75 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { CreatePostModal } from "@/components/CreatePostModal";
 import { Post } from "@/components/PostCard/post";
 import { PostCard } from "@/components/PostCard/PostCard";
 import { auth, db } from "@/lib/firebase";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  updateDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const user = auth.currentUser;
+  const [lastDoc, setLastDoc] = useState<any>(null); // Lưu document cuối cùng của lô trước
+  const [hasMore, setHasMore] = useState(true); // Kiểm tra còn dữ liệu để tải không
   const router = useRouter();
+  const POSTS_PER_PAGE = 5; // Số bài viết tải mỗi lần
 
-  // Lấy và sắp xếp bài viết từ Firestore
-  const fetchPosts = async () => {
-    const querySnapshot = await getDocs(collection(db, "posts"));
-    const postsData = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Post[];
-    // Sắp xếp theo upvotes giảm dần
-    postsData.sort((a, b) => b.upvotes - a.upvotes);
-    setPosts(postsData);
+  const user = auth.currentUser;
+
+  // Hàm tải bài viết
+  const fetchPosts = async (isInitialLoad = false) => {
+    try {
+      let q;
+      if (isInitialLoad || !lastDoc) {
+        // Lần tải đầu tiên
+        q = query(
+          collection(db, "posts"),
+          orderBy("upvotes", "desc"), // Sắp xếp theo upvotes giảm dần
+          limit(POSTS_PER_PAGE),
+        );
+      } else {
+        // Tải lô tiếp theo
+        q = query(
+          collection(db, "posts"),
+          orderBy("upvotes", "desc"),
+          startAfter(lastDoc),
+          limit(POSTS_PER_PAGE),
+        );
+      }
+
+      const querySnapshot = await getDocs(q);
+      const newPosts = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Post[];
+
+      if (newPosts.length < POSTS_PER_PAGE) setHasMore(false); // Không còn dữ liệu để tải
+
+      setPosts((prevPosts) =>
+        isInitialLoad ? newPosts : [...prevPosts, ...newPosts],
+      );
+      setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1]); // Lưu document cuối
+    } catch (error) {
+      console.error("Lỗi khi tải bài viết:", error);
+    }
   };
 
+  // Tải lần đầu khi trang được render
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(true);
   }, []);
 
   const handleVote = async (id: string, voteType: "up" | "down") => {
@@ -74,28 +117,15 @@ export default function Home() {
       downvotes,
       votes: updatedVotes,
     });
-    fetchPosts(); // Refresh danh sách
+    fetchPosts(true); // Reset và tải lại từ đầu vì upvotes thay đổi
   };
 
   const handleUpvote = (id: string) => handleVote(id, "up");
   const handleDownvote = (id: string) => handleVote(id, "down");
 
   const handleDelete = (id: string) => {
-    Swal.fire({
-      title: "Bạn có chắc muốn xoá bài viết này!",
-      showConfirmButton: true,
-      confirmButtonText: "Xoá",
-      confirmButtonColor: "#2E2E2E",
-
-      showCancelButton: true,
-      cancelButtonText: "Hủy",
-      cancelButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-        fetchPosts();
-      }
-    });
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // Xóa khỏi state ngay lập tức
+    fetchPosts(); // Refresh từ Firestore để đảm bảo đồng bộ
   };
 
   return (
@@ -104,15 +134,23 @@ export default function Home() {
         <h1 className="text-3xl font-bold">Bài viết</h1>
         {user && <CreatePostModal onCreate={fetchPosts} />}
       </div>
-      {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          onUpvote={handleUpvote}
-          onDownvote={handleDownvote}
-          onDelete={handleDelete}
-        />
-      ))}
+      <InfiniteScroll
+        dataLength={posts.length} // Tổng số bài viết hiện tại
+        next={() => fetchPosts(false)} // Hàm tải thêm bài viết
+        hasMore={hasMore} // Còn dữ liệu để tải không
+        loader={<h4 className="text-center">Đang tải...</h4>} // Hiển thị khi đang tải
+        endMessage={<p className="text-center">Đã tải hết bài viết!</p>} // Khi hết dữ liệu
+      >
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onUpvote={handleUpvote}
+            onDownvote={handleDownvote}
+            onDelete={handleDelete}
+          />
+        ))}
+      </InfiniteScroll>
     </main>
   );
 }
