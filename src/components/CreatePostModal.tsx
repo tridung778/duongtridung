@@ -64,7 +64,8 @@ export function CreatePostModal({ onCreate }: CreatePostModalProps) {
           upvotes: 0,
           downvotes: 0,
           userId: user.uid,
-          email: user.email,
+          avatar: user.photoURL,
+          name: user.displayName,
           createdAt: new Date().toISOString(),
           votes: {},
         });

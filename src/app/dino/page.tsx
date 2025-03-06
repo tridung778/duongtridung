@@ -61,7 +61,8 @@ const DinoGame = () => {
         await setDoc(
           doc(db, "leaderboard", user.uid),
           {
-            email: user.email,
+            name: user.displayName,
+            avatar: user.photoURL,
             score: newScore,
             timestamp: new Date().toISOString(),
           },

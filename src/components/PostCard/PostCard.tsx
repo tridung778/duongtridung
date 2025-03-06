@@ -2,9 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, Trash2 } from "lucide-react";
-import { Post } from "./post";
 import { Label } from "../ui/label";
-import maskEmail from "@/utils/maskEmail";
 import { formatReadableDate } from "@/utils/formatReadableDate";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "@/lib/firebase";
@@ -16,6 +14,8 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import Swal from "sweetalert2";
+import { Post } from "@/type";
+import { Avatar, AvatarImage } from "../ui/avatar";
 
 interface PostCardProps {
   post: Post;
@@ -66,7 +66,12 @@ export function PostCard({
       <CardContent>
         <p className="text-[16x]">{post.content}</p>
         <Label className="mt-4 text-[12px] font-thin">
-          {maskEmail(post.email)} - {formatReadableDate(post.createdAt)}
+          <Avatar className="size-[24px]">
+            <AvatarImage src={post.avatar || "/avatar.jpg"} alt="@shadcn" />
+          </Avatar>
+          <div>
+            {post.name} - {formatReadableDate(post.createdAt)}
+          </div>
         </Label>
         <div className="mt-4 flex gap-4">
           <div className="flex items-center gap-2">

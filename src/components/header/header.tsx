@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useState } from "react";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
@@ -12,16 +13,19 @@ import { ModeToggle } from "../mode-toggle";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import maskEmail from "@/utils/maskEmail";
+import { Avatar } from "../ui/avatar";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [email, setEmail] = useState("");
+  const [userLogged, setUserLogged] = useState<any>("");
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setEmail(user?.email || "");
+      // console.log("User logged:", user);
+
+      setUserLogged(user || "");
       setIsLoggedIn(!!user); // user tồn tại thì isLoggedIn = true
     });
     return () => unsubscribe(); // Cleanup khi component unmount
@@ -144,8 +148,14 @@ const Header = () => {
         </NavigationMenu>
         <div className="ml-auto flex gap-2">
           {isLoggedIn ? (
-            <div>
-              {maskEmail(email)}{" "}
+            <div className="flex items-center gap-2">
+              <Avatar>
+                <AvatarImage
+                  src={userLogged.photoURL || "/avatar.jpg"}
+                  alt="@shadcn"
+                />
+              </Avatar>
+              {userLogged.displayName}{" "}
               <Button onClick={handleLogout}>Đăng xuất</Button>
             </div>
           ) : (

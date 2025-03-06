@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableHeader,
@@ -9,7 +9,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { db } from "@/lib/firebase";
-import maskEmail from "@/utils/maskEmail";
+import { LeaderBoardEntry, LeaderBoardProps } from "@/type";
 import {
   collection,
   limit,
@@ -17,18 +17,7 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-
-interface LeaderBoardEntry {
-  email: string;
-  score: number;
-  uid: string;
-}
-
-interface LeaderBoardProps {
-  currentUser: any; // Người dùng hiện tại
-}
 
 export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderBoardEntry[]>([]);
@@ -38,7 +27,7 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
     const q = query(
       collection(db, "leaderboard"),
       orderBy("score", "desc"), // Sắp xếp theo điểm giảm dần
-      limit(10) // Giới hạn 10 người chơi hàng đầu
+      limit(10), // Giới hạn 10 người chơi hàng đầu
     );
 
     // Sử dụng onSnapshot để lắng nghe thay đổi
@@ -50,7 +39,8 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
           const data = doc.data();
           leaderboardData.push({
             uid: doc.id,
-            email: data.email,
+            name: data.name,
+            avatar: data.avatar,
             score: data.score,
           });
         });
@@ -58,7 +48,7 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
       },
       (error) => {
         console.error("Lỗi khi lấy bảng xếp hạng:", error);
-      }
+      },
     );
 
     // Cleanup khi component unmount
@@ -66,11 +56,11 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
   }, []); // Chạy một lần khi mount, nhưng lắng nghe liên tục
 
   return (
-    <Table className="w-full mt-4">
+    <Table className="mt-4 w-full">
       <TableHeader>
         <TableRow>
           <TableHead className="w-[40px] text-center">Hạng</TableHead>
-          <TableHead className="w-[200px]">Email</TableHead>
+          <TableHead className="w-[200px]">Tên</TableHead>
           <TableHead className="w-[50px] text-center">Điểm</TableHead>
         </TableRow>
       </TableHeader>
@@ -78,7 +68,7 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
         {leaderboard.map((entry, index) => (
           <TableRow
             key={entry.uid}
-            className={`hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors ${
+            className={`transition-colors hover:bg-gray-200 dark:hover:bg-gray-800 ${
               entry.uid === currentUser?.uid
                 ? "bg-lime-100 dark:bg-green-900"
                 : ""
@@ -89,13 +79,10 @@ export default function LeaderBoard({ currentUser }: LeaderBoardProps) {
             </TableCell>
             <TableCell className="font-medium">
               <div className="flex items-center gap-2">
-                <Link
-                  href={`#${entry.uid}`}
-                  className=" hover:underline"
-                  prefetch={false}
-                >
-                  {maskEmail(entry.email)}
-                </Link>
+                <Avatar>
+                  <AvatarImage src={entry.avatar} />
+                </Avatar>
+                <div>{entry.name}</div>
               </div>
             </TableCell>
             <TableCell className="text-center">{entry.score}</TableCell>
