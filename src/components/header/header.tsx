@@ -160,9 +160,9 @@ const Header = () => {
             </div>
           ) : (
             <>
-              <Button variant="outline" onClick={() => router.push("/signup")}>
+              {/* <Button variant="outline" onClick={() => router.push("/signup")}>
                 Đăng ký
-              </Button>
+              </Button> */}
               <Button onClick={() => router.push("/login")}>Đăng nhập</Button>
             </>
           )}

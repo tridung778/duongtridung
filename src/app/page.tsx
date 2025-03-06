@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { CreatePostModal } from "@/components/CreatePostModal";
-import { Post } from "@/components/PostCard/post";
+
 import { PostCard } from "@/components/PostCard/PostCard";
 import { auth, db } from "@/lib/firebase";
 import {
@@ -21,6 +21,7 @@ import Swal from "sweetalert2";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
+import { Post } from "@/type";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -150,6 +151,14 @@ export default function Home() {
     fetchPosts(); // Refresh từ Firestore để đảm bảo đồng bộ
   };
 
+  const handleUpdate = (id: string, updatedPost: Partial<Post>) => {
+    setPosts(
+      posts.map((post) =>
+        post.id === id ? { ...post, ...updatedPost } : post,
+      ),
+    );
+  };
+
   // Hàm cuộn lên trên
   const scrollToTop = () => {
     window.scrollTo({
@@ -178,6 +187,7 @@ export default function Home() {
             onUpvote={handleUpvote}
             onDownvote={handleDownvote}
             onDelete={handleDelete}
+            onUpdate={handleUpdate}
           />
         ))}
       </InfiniteScroll>

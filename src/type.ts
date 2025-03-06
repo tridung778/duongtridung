@@ -1,17 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type Post = {
+export interface Comment {
+  id: string;
+  content: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  createdAt: string;
+}
+
+export interface Post {
   id: string;
   title: string;
   content: string;
+  userId: string;
+  name: string;
+  avatar?: string;
+  createdAt: string;
+  updatedAt?: string;
   upvotes: number;
   downvotes: number;
-  userId: string;
-  avatar: string;
-  name: string;
-  createdAt: string;
-  votes?: Record<string, "up" | "down">; // Lưu userId và loại vote
-};
-
+  votes?: Record<string, "up" | "down">;
+  comments?: Comment[];
+}
 export interface LeaderBoardEntry {
   name: string;
   score: number;
