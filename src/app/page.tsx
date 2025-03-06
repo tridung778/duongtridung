@@ -22,6 +22,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
 import { Post } from "@/type";
+import MiniLeaderBoard from "@/components/MiniLeaderBoard/MiniLeaderBoard";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -168,40 +169,55 @@ export default function Home() {
   };
 
   return (
-    <main className="mx-auto max-w-2xl p-4">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Bài viết</h1>
-        {user && <CreatePostModal onCreate={fetchPosts} />}
+    <main className="grid grid-cols-12 gap-4 px-4">
+      {/* Cột trái (có thể để trống hoặc thêm nội dung khác) */}
+      <div className="col-span-2 hidden lg:block">
+        {/* Có thể thêm sidebar hoặc để trống */}
       </div>
-      <InfiniteScroll
-        dataLength={posts.length} // Tổng số bài viết hiện tại
-        next={() => fetchPosts(false)} // Hàm tải thêm bài viết
-        hasMore={hasMore} // Còn dữ liệu để tải không
-        loader={<h4 className="text-center">Đang tải...</h4>} // Hiển thị khi đang tải
-        endMessage={<p className="text-center">Đã tải hết bài viết!</p>} // Khi hết dữ liệu
-      >
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            onUpvote={handleUpvote}
-            onDownvote={handleDownvote}
-            onDelete={handleDelete}
-            onUpdate={handleUpdate}
-          />
-        ))}
-      </InfiniteScroll>
 
-      {/* Nút cuộn lên trên */}
-      {showScrollTop && (
-        <Button
-          onClick={scrollToTop}
-          className="fixed right-4 bottom-4 rounded-full p-2"
-          variant="default"
+      {/* Cột giữa - Bài viết */}
+      <div className="col-span-12 mx-auto w-full max-w-2xl lg:col-span-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Bài viết</h1>
+          {user && <CreatePostModal onCreate={fetchPosts} />}
+        </div>
+        <InfiniteScroll
+          dataLength={posts.length}
+          next={() => fetchPosts(false)}
+          hasMore={hasMore}
+          loader={<h4 className="text-center">Đang tải...</h4>}
+          endMessage={<p className="text-center">Đã tải hết bài viết!</p>}
         >
-          <ArrowUp className="h-6 w-6" />
-        </Button>
-      )}
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onUpvote={handleUpvote}
+              onDownvote={handleDownvote}
+              onDelete={handleDelete}
+              onUpdate={handleUpdate}
+            />
+          ))}
+        </InfiniteScroll>
+
+        {/* Nút cuộn lên trên */}
+        {showScrollTop && (
+          <Button
+            onClick={scrollToTop}
+            className="fixed right-4 bottom-4 rounded-full p-2"
+            variant="default"
+          >
+            <ArrowUp className="h-6 w-6" />
+          </Button>
+        )}
+      </div>
+
+      {/* Cột phải - Bảng xếp hạng */}
+      <div className="col-span-2 hidden lg:block">
+        <div className="sticky top-4">
+          <MiniLeaderBoard currentUser={user} />
+        </div>
+      </div>
     </main>
   );
 }
