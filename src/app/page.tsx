@@ -176,7 +176,7 @@ export default function Home() {
       </div>
 
       {/* Cột giữa - Bài viết */}
-      <div className="col-span-12 mx-auto w-full max-w-2xl lg:col-span-8">
+      <div className="col-span-12 mx-auto w-full max-w-2xl lg:col-span-7">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold">Bài viết</h1>
           {user && <CreatePostModal onCreate={fetchPosts} />}
@@ -213,7 +213,7 @@ export default function Home() {
       </div>
 
       {/* Cột phải - Bảng xếp hạng */}
-      <div className="col-span-2 hidden lg:block">
+      <div className="col-span-3 hidden lg:block">
         <div className="sticky top-4">
           <MiniLeaderBoard currentUser={user} />
         </div>

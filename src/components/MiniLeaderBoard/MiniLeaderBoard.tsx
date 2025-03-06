@@ -47,7 +47,7 @@ export default function MiniLeaderBoard({ currentUser }: LeaderBoardProps) {
 
   return (
     <div className="w-full max-w-xs rounded-lg border p-4 shadow-sm">
-      <h3 className="mb-2 text-lg font-semibold">Top 5 Người Chơi</h3>
+      <h3 className="mb-2 text-lg font-semibold">Top 5 khủng long</h3>
       <div className="space-y-2">
         {leaderboard.map((entry, index) => (
           <div
