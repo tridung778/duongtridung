@@ -1,7 +1,7 @@
 import { google, drive_v3 } from "googleapis";
-import path from "path";
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
+import auth from "./../../../lib/auth";
 
 interface CharacterData {
   name: string; // Tên nhân vật (tên folder)
@@ -65,11 +65,6 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const character = searchParams.get("character")?.toLowerCase();
-
-    const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(process.cwd(), "credentials.json"),
-      scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-    });
 
     const drive: drive_v3.Drive = google.drive({ version: "v3", auth });
     const iconArtFolderId = "1rIBgjLAocYKRwU1fDPvsA_Cz-FeIFiHf";

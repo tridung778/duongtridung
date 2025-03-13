@@ -1,6 +1,6 @@
 import { drive_v3, google } from "googleapis";
-import path from "path";
 import { unstable_cache } from "next/cache";
+import auth from "./../../../lib/auth";
 
 interface CharacterData {
   name: string;
@@ -12,11 +12,6 @@ interface CharacterData {
 const getCharacterData = async (
   characterName: string,
 ): Promise<CharacterData | null> => {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: path.join(process.cwd(), "credentials.json"),
-    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-  });
-
   const drive: drive_v3.Drive = google.drive({ version: "v3", auth });
   const iconArtFolderId = "1rIBgjLAocYKRwU1fDPvsA_Cz-FeIFiHf";
   const splashArtFolderId = "15I50L-80QPJmiJ6Dg8t36q-1g_g9W8tp";
