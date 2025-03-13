@@ -1,27 +1,54 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 import { useState, useEffect } from "react";
-import { fetchCharacterData } from "@/app/api/getSplashArts/route"; // Đảm bảo đường dẫn đúng
 import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 
-export default function CharacterPage({
-  params,
-}: {
-  params: { name: string };
-}) {
-  const characterName = decodeURIComponent(params.name);
-  const [character, setCharacter] = useState<any>(null);
-  const [selectedArt, setSelectedArt] = useState<any>(null);
+interface Icon {
+  id: string;
+  name: string;
+  url: string;
+}
+
+interface Character {
+  name: string;
+  defaultIcon: string | null;
+  icons: Icon[];
+}
+
+export default function CharacterPage() {
+  const params = useParams();
+  const characterName = decodeURIComponent(params.name as string);
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [selectedArt, setSelectedArt] = useState<Icon | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchCharacterData(characterName);
-      if (!data) {
-        notFound();
-      } else {
-        setCharacter(data);
-        setSelectedArt(data.splashArts[0]);
+      try {
+        const response = await fetch(
+          `/api/getSplashArts?character=${characterName}`,
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch character data");
+        }
+        const data: Character[] = await response.json();
+        const foundCharacter = data.find(
+          (c) => c.name.toLowerCase() === characterName.toLowerCase(),
+        );
+
+        if (!foundCharacter) {
+          notFound();
+        } else {
+          setCharacter(foundCharacter);
+          const defaultIcon = foundCharacter.defaultIcon
+            ? foundCharacter.icons.find(
+                (icon) => icon.url === foundCharacter.defaultIcon,
+              )
+            : foundCharacter.icons[0];
+          setSelectedArt(defaultIcon || foundCharacter.icons[0]);
+        }
+      } catch (error) {
+        console.error("Fetch data error:", error);
       }
     };
 
@@ -43,7 +70,7 @@ export default function CharacterPage({
       </div>
       <h2 className="mt-8 text-2xl">Trang phục</h2>
       <div className="mt-4 flex max-w-xl gap-2 overflow-x-auto">
-        {character.splashArts.map((art: any) => (
+        {character.icons.map((art) => (
           <img
             key={art.id}
             src={art.url}

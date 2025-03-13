@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   fastRefresh: false,
+  webpack: (config) => {
+    config.resolve.fallback = {
+      child_process: false,
+      os: false,
+    };
+    return config;
+  },
 };
 
 export default nextConfig;
