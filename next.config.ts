@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
     domains: ["drive.google.com", "lh3.googleusercontent.com"],
   },
   reactStrictMode: true,
-  fastRefresh: false,
   webpack: (config) => {
     config.resolve.fallback = {
       child_process: false,

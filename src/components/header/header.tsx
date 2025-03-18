@@ -15,7 +15,6 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Avatar } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import Image from "next/image";
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,7 +50,7 @@ const Header = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <Link href="#" prefetch={false}>
+            {/* <Link href="#" prefetch={false}>
               <Image
                 src="/images/Furina_Avatar.webp"
                 alt="Mô tả hình ảnh"
@@ -59,7 +58,7 @@ const Header = () => {
                 height={32}
               />
               <span className="sr-only">ShadCN</span>
-            </Link>
+            </Link> */}
             <div className="grid gap-2 py-6">
               <Link
                 href="/"
@@ -69,11 +68,11 @@ const Header = () => {
                 Trang chủ
               </Link>
               <Link
-                href="#"
+                href="/blog"
                 className="flex w-full items-center py-2 text-lg font-semibold"
                 prefetch={false}
               >
-                Trang cá nhân
+                Blog
               </Link>
               <Link
                 href="/travenhanh"
@@ -99,7 +98,7 @@ const Header = () => {
             </div>
           </SheetContent>
         </Sheet>
-        <Link href="#" className="mr-6 hidden lg:flex" prefetch={false}>
+        {/* <Link href="#" className="mr-6 hidden lg:flex" prefetch={false}>
           <Image
             src="/images/Furina_Avatar.webp"
             alt="Mô tả hình ảnh"
@@ -107,7 +106,7 @@ const Header = () => {
             height={32}
           />
           <span className="sr-only">ShadCN</span>
-        </Link>
+        </Link> */}
         <NavigationMenu className="hidden lg:flex">
           <NavigationMenuList>
             <NavigationMenuLink asChild>
@@ -121,11 +120,11 @@ const Header = () => {
             </NavigationMenuLink>
             <NavigationMenuLink asChild>
               <Link
-                href="#"
+                href="/blog"
                 className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
                 prefetch={false}
               >
-                Trang cá nhân
+                Blog
               </Link>
             </NavigationMenuLink>
             <NavigationMenuLink asChild>
@@ -146,7 +145,7 @@ const Header = () => {
                 Khủng long
               </Link>
             </NavigationMenuLink>
-            <NavigationMenuLink asChild>
+            {/* <NavigationMenuLink asChild>
               <Link
                 href="/photo-aov"
                 className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
@@ -154,7 +153,7 @@ const Header = () => {
               >
                 Tạo ảnh liên quân
               </Link>
-            </NavigationMenuLink>
+            </NavigationMenuLink> */}
           </NavigationMenuList>
         </NavigationMenu>
         <div className="ml-auto flex gap-2">
