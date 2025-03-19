@@ -16,7 +16,7 @@ export default function Home() {
               animationDuration={1}
               pauseBetweenAnimations={1}
             />
-            <div className="text-4xl">is a Sorfware Deverloper</div>
+            <div className="text-4xl">is a Software Developer</div>
           </div>
           <div className="absolute top-15 right-0 left-0">
             <Lanyard position={[0, 0, 20]} />

@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import Head from "next/head";
+import Aurora from "@/blocks/Backgrounds/Aurora/Aurora";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,8 +52,18 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          {children}
+          <div className="fixed top-0 left-0 h-full w-full">
+            <Aurora
+              // colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
+              blend={0.5}
+              amplitude={0.3}
+              speed={0.5}
+            />
+          </div>
+          <div className="relative z-10">
+            <Header />
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
