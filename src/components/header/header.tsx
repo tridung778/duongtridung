@@ -15,6 +15,17 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Avatar } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
+import GooeyNav from "@/blocks/Components/GooeyNav/GooeyNav";
+
+const items = [
+  { label: " Trang chủ", href: "/" },
+
+  { label: "Blog", href: "/blog" },
+
+  { label: "Tra vé nhanh", href: "/travenhanh" },
+
+  { label: "Khủng long", href: "/dino" },
+];
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -107,7 +118,7 @@ const Header = () => {
           />
           <span className="sr-only">ShadCN</span>
         </Link> */}
-        <NavigationMenu className="hidden lg:flex">
+        {/* <NavigationMenu className="hidden lg:flex">
           <NavigationMenuList>
             <NavigationMenuLink asChild>
               <Link
@@ -145,17 +156,18 @@ const Header = () => {
                 Khủng long
               </Link>
             </NavigationMenuLink>
-            {/* <NavigationMenuLink asChild>
-              <Link
-                href="/photo-aov"
-                className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-                prefetch={false}
-              >
-                Tạo ảnh liên quân
-              </Link>
-            </NavigationMenuLink> */}
           </NavigationMenuList>
-        </NavigationMenu>
+        </NavigationMenu> */}
+        <GooeyNav
+          items={items}
+          animationTime={600}
+          pCount={15}
+          minDistance={20}
+          maxDistance={42}
+          maxRotate={75}
+          colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+          timeVariance={300}
+        />
         <div className="ml-auto flex gap-2">
           {isLoggedIn ? (
             <div className="flex items-center gap-2">
