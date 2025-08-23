@@ -25,6 +25,8 @@ const items = [
   { label: "Tra vé nhanh", href: "/travenhanh" },
 
   { label: "Khủng long", href: "/dino" },
+
+  { label: "BMI", href: "/bmi" },
 ];
 
 const Header = () => {
