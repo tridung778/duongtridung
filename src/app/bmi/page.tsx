@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   CheckCircle,
 } from "lucide-react";
-import { ModeToggle } from "@/components/mode-toggle";
+import Sidebar from "@/components/Sidebar";
 
 interface BMIResult {
   bmi: number;
@@ -146,7 +146,7 @@ const BMICalculator = () => {
     setError("");
   };
 
-  return (
+  const BMIContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-8 transition-colors duration-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8 text-center">
@@ -155,9 +155,6 @@ const BMICalculator = () => {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
               Máy Tính BMI
             </h1>
-            {/* <div className="ml-4">
-              <ModeToggle />
-            </div> */}
           </div>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
             Tính chỉ số khối cơ thể (BMI) để hiểu rõ phân loại cân nặng và nhận
@@ -373,6 +370,12 @@ const BMICalculator = () => {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <Sidebar>
+      <BMIContent />
+    </Sidebar>
   );
 };
 

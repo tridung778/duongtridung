@@ -19,11 +19,12 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Button } from "@/components/ui/button";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, FileText } from "lucide-react";
 import { Post } from "@/type";
 import MiniLeaderBoard from "@/components/MiniLeaderBoard/MiniLeaderBoard";
+import Sidebar from "@/components/Sidebar";
 
-const page = () => {
+const BlogPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [lastDoc, setLastDoc] = useState<any>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -58,10 +59,9 @@ const page = () => {
       })) as Post[];
 
       if (newPosts.length === 0 || newPosts.length < POSTS_PER_PAGE) {
-        setHasMore(false); // Không còn dữ liệu để tải
+        setHasMore(false);
       }
 
-      // Loại bỏ trùng lặp dựa trên id
       setPosts((prevPosts) => {
         const existingIds = new Set(prevPosts.map((post) => post.id));
         const filteredNewPosts = newPosts.filter(
@@ -75,16 +75,14 @@ const page = () => {
       console.error("Lỗi khi tải bài viết:", error);
     }
   };
-  // Tải lần đầu khi trang được render
+
   useEffect(() => {
     fetchPosts(true);
   }, []);
 
-  // Theo dõi cuộn để hiển thị nút
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 300) {
-        // Hiển thị nút khi cuộn xuống 300px
         setShowScrollTop(true);
       } else {
         setShowScrollTop(false);
@@ -92,20 +90,16 @@ const page = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll); // Dọn dẹp
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleVote = async (id: string, voteType: "up" | "down") => {
+  const handleUpvote = async (id: string) => {
     if (!user) {
       Swal.fire({
-        title: "Vui lòng đăng nhập để vote!",
-        showConfirmButton: true,
+        title: "Cần đăng nhập",
+        text: "Bạn cần đăng nhập để vote bài viết",
+        icon: "warning",
         confirmButtonText: "Đăng nhập",
-        confirmButtonColor: "#2E2E2E",
-
-        showCancelButton: true,
-        cancelButtonText: "Hủy",
-        cancelButtonColor: "#d33",
       }).then((result) => {
         if (result.isConfirmed) {
           router.push("/login");
@@ -114,111 +108,155 @@ const page = () => {
       return;
     }
 
-    const postRef = doc(db, "posts", id);
-    const post = posts.find((p) => p.id === id);
-    if (!post) return;
+    try {
+      const postRef = doc(db, "posts", id);
+      const post = posts.find((p) => p.id === id);
+      if (!post) return;
 
-    const currentVote = post.votes?.[user.uid]; // Kiểm tra user đã vote chưa
-    let upvotes = post.upvotes;
-    let downvotes = post.downvotes;
-    const updatedVotes = { ...post.votes };
+      const newUpvotes = (post.upvotes || 0) + 1;
+      await updateDoc(postRef, { upvotes: newUpvotes });
 
-    if (currentVote) {
-      // Nếu đã vote trước đó
-      if (currentVote === voteType) return; // Không làm gì nếu vote lại cùng loại
-      if (currentVote === "up") upvotes--; // Hủy upvote
-      if (currentVote === "down") downvotes--; // Hủy downvote
+      setPosts((prevPosts) =>
+        prevPosts.map((p) => (p.id === id ? { ...p, upvotes: newUpvotes } : p)),
+      );
+    } catch (error) {
+      console.error("Lỗi khi vote:", error);
     }
-
-    // Cập nhật vote mới
-    if (voteType === "up") upvotes++;
-    if (voteType === "down") downvotes++;
-    updatedVotes[user.uid] = voteType;
-
-    await updateDoc(postRef, {
-      upvotes,
-      downvotes,
-      votes: updatedVotes,
-    });
-    fetchPosts(true); // Reset và tải lại từ đầu vì upvotes thay đổi
   };
 
-  const handleUpvote = (id: string) => handleVote(id, "up");
-  const handleDownvote = (id: string) => handleVote(id, "down");
+  const handleDownvote = async (id: string) => {
+    if (!user) {
+      Swal.fire({
+        title: "Cần đăng nhập",
+        text: "Bạn cần đăng nhập để vote bài viết",
+        icon: "warning",
+        confirmButtonText: "Đăng nhập",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
+      });
+      return;
+    }
+
+    try {
+      const postRef = doc(db, "posts", id);
+      const post = posts.find((p) => p.id === id);
+      if (!post) return;
+
+      const newDownvotes = (post.downvotes || 0) + 1;
+      await updateDoc(postRef, { downvotes: newDownvotes });
+
+      setPosts((prevPosts) =>
+        prevPosts.map((p) =>
+          p.id === id ? { ...p, downvotes: newDownvotes } : p,
+        ),
+      );
+    } catch (error) {
+      console.error("Lỗi khi vote:", error);
+    }
+  };
 
   const handleDelete = (id: string) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // Xóa khỏi state ngay lập tức
-    fetchPosts(); // Refresh từ Firestore để đảm bảo đồng bộ
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+    fetchPosts(true);
   };
 
   const handleUpdate = (id: string, updatedPost: Partial<Post>) => {
-    setPosts(
-      posts.map((post) =>
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
         post.id === id ? { ...post, ...updatedPost } : post,
       ),
     );
   };
 
-  // Hàm cuộn lên trên
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // Cuộn mượt mà
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  return (
-    <main className="grid grid-cols-12 gap-4 px-4">
-      {/* Cột trái (có thể để trống hoặc thêm nội dung khác) */}
-      <div className="col-span-2 hidden lg:block">
-        {/* Có thể thêm sidebar hoặc để trống */}
-      </div>
+  const BlogContent = () => (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 transition-colors duration-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <FileText className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+              Blog
+            </h1>
+          </div>
+          <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+            Chia sẻ kiến thức, kinh nghiệm và những điều thú vị về công nghệ
+          </p>
+        </div>
 
-      {/* Cột giữa - Bài viết */}
-      <div className="col-span-12 mx-auto w-full max-w-2xl lg:col-span-7">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Bài viết</h1>
+        {/* Create Post Button */}
+        <div className="mb-8 flex justify-center">
           {user && <CreatePostModal onCreate={fetchPosts} />}
         </div>
-        <InfiniteScroll
-          dataLength={posts.length}
-          next={() => fetchPosts(false)}
-          hasMore={hasMore}
-          loader={<h4 className="text-center">Đang tải...</h4>}
-          endMessage={<p className="text-center">Đã tải hết bài viết!</p>}
-        >
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onUpvote={handleUpvote}
-              onDownvote={handleDownvote}
-              onDelete={handleDelete}
-              onUpdate={handleUpdate}
-            />
-          ))}
-        </InfiniteScroll>
 
-        {/* Nút cuộn lên trên */}
+        {/* Main Content Grid */}
+        <div className="grid gap-8 lg:grid-cols-4">
+          {/* Posts Section */}
+          <div className="lg:col-span-3">
+            <div className="rounded-lg border-0 bg-white/80 p-6 shadow-lg backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/80">
+              <InfiniteScroll
+                dataLength={posts.length}
+                next={() => fetchPosts(false)}
+                hasMore={hasMore}
+                loader={
+                  <div className="py-4 text-center">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
+                  </div>
+                }
+                endMessage={
+                  <div className="py-4 text-center text-gray-500 dark:text-gray-400">
+                    <p>Đã tải hết bài viết!</p>
+                  </div>
+                }
+                className="space-y-6"
+              >
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onUpvote={handleUpvote}
+                    onDownvote={handleDownvote}
+                    onDelete={handleDelete}
+                    onUpdate={handleUpdate}
+                  />
+                ))}
+              </InfiniteScroll>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <MiniLeaderBoard currentUser={user} />
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll to Top Button */}
         {showScrollTop && (
           <Button
             onClick={scrollToTop}
-            className="fixed right-4 bottom-4 rounded-full p-2"
-            variant="default"
+            className="fixed right-8 bottom-8 z-50 rounded-full bg-blue-600 p-3 shadow-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            size="icon"
           >
-            <ArrowUp className="h-6 w-6" />
+            <ArrowUp className="h-5 w-5" />
           </Button>
         )}
       </div>
+    </div>
+  );
 
-      {/* Cột phải - Bảng xếp hạng */}
-      <div className="col-span-3 hidden lg:block">
-        <div className="sticky top-4">
-          <MiniLeaderBoard currentUser={user} />
-        </div>
-      </div>
-    </main>
+  return (
+    <Sidebar>
+      <BlogContent />
+    </Sidebar>
   );
 };
 
-export default page;
+export default BlogPage;
